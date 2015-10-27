@@ -11,7 +11,7 @@ html, body {
 }
 
 body, button {
-    font-family: 'PT Sans', sans-serif;
+    font-family: 'Roboto Condensed', sans-serif;
     font-size: @fontSize;
 }
 
@@ -59,6 +59,10 @@ button {
 table.instructions {
     margin-top: @skip / 2;
     margin-bottom: @skip / 2;
+
+    td:first-child {
+        width: 160px;
+    }
 }
 
 .canvas {
@@ -151,4 +155,12 @@ table.instructions {
 
 .parachute2 {
     .parachute(@c2);
+}
+
+p.credits {
+    font-size: 14px;
+    line-height: 150%;
+    margin-top: @skip;
+
+    text-align: center;
 }
