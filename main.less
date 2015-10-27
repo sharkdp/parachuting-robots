@@ -1,0 +1,154 @@
+@width: 800px;
+@fontSize: 15px;
+@gray: #f0f0f0;
+@borderGray: #666;
+@c1: #B20045;
+@c2: #35B23D;
+@skip: 30px;
+
+html, body {
+    margin: 0;
+}
+
+body, button {
+    font-family: 'PT Sans', sans-serif;
+    font-size: @fontSize;
+}
+
+#outer {
+    width: 100%;
+}
+
+#container {
+    width: @width;
+    max-width: 95%;
+    margin: 0 auto;
+}
+
+textarea, textarea:focus {
+    font-family: 'Source Code Pro', courier;
+    font-size: @fontSize;
+
+    background-color: @gray;
+    outline: none !important;
+    border: 1px solid @borderGray;
+    color: #000;
+
+    width: 100%;
+    padding: 4px;
+}
+
+code {
+    font-family: 'Source Code Pro', courier;
+    padding: 2px;
+    color: @c1;
+}
+
+a, a:active, a:hover {
+    color: @c1;
+}
+
+button {
+    margin-left: 10px;
+}
+
+.buttons {
+    text-align: center;
+}
+
+table.instructions {
+    margin-top: @skip / 2;
+    margin-bottom: @skip / 2;
+}
+
+.canvas {
+    position: relative;
+    border: 1px dashed black;
+    width: 100%;
+    height: 50px;
+}
+
+.panel {
+    margin-top: @skip;
+    margin-bottom: @skip;
+    width: 100%;
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.editor {
+    width: 49.99%;
+    float: left;
+    padding-right: @skip / 2;
+}
+
+.program {
+    width: 49.99%;
+    float: left;
+    padding-left: @skip / 2;
+
+    table {
+        width: 100%;
+    }
+    th {
+        text-align: left;
+    }
+    td, th {
+        border: 1px solid @borderGray;
+    }
+    td:nth-child(1), td:nth-child(2) {
+        text-align: center;
+        width: 16px;
+    }
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.robot(@color) {
+    width: 10px;
+    height: 10px;
+    background-color: @color;
+}
+
+.robot1 {
+    position: absolute;
+    top: 24px;
+    .robot(@c1);
+}
+
+.robot2 {
+    position: absolute;
+    top: 24px;
+    .robot(@c2);
+}
+
+.label1 {
+    margin: 0 3px;
+    .robot(@c1);
+}
+
+.label2 {
+    margin: 0 3px;
+    .robot(@c2);
+}
+
+.parachute(@color) {
+    position: absolute;
+    width: 10px;
+    height: 8px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background-color: @color;
+    top: 13px;
+}
+
+.parachute1 {
+    .parachute(@c1);
+}
+
+.parachute2 {
+    .parachute(@c2);
+}

@@ -1,6 +1,7 @@
 module Language.Robo.Spec where
 
 import Prelude
+
 import Data.List
 import Data.Maybe
 import Data.Generic
@@ -9,7 +10,7 @@ type Label = String
 
 data Instruction = MoveLeft
                  | MoveRight
-                 | SkipIfParachute
+                 | SkipNext
                  | Goto Label
 
 data LInstruction = LInstruction (Maybe Label) Instruction
