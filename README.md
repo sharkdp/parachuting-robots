@@ -1,5 +1,7 @@
 # Robots with parachutes
 
+[*Play it online*](http://david-peter.de/parachuted-robots/)
+
 ## Installation
 
 ```
