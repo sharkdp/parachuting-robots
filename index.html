@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Parachuting Robots</title>
+        <meta name="author" content="David Peter">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+
+        <style>
+            html, body {
+                margin: 0;
+                padding: 20px;
+            }
+            body, button {
+                font-family: 'PT Sans', sans-serif;
+            }
+            textarea {
+                background-color: #eee;
+                font-family: 'Source Code Pro', courier;
+                font-size: 18px;
+                width: 100%;
+            }
+            #output {
+                font-family: 'Source Code Pro', courier;
+                font-size: 14px;
+            }
+            button {
+                font-size: 14px;
+            }
+            table tr td {
+                vertical-align: top;
+            }
+            .buttons {
+                text-align: center;
+            }
+        </style>
+        <!-- <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+        <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <canvas id="canvas" width="800" height="50"></canvas>
+        <div id="controls">
+<textarea autofocus spellcheck="false" id="code" rows="10" placeholder="Enter your code here..">
+1: left
+left
+skip
+goto 1
+</textarea>
+            <br>
+            <div class="buttons">
+                <button id="init"><i class="fa fa-random"></i> Initialize</button>
+                <button id="step"><i class="fa fa-step-forward"></i> Single step</button>
+                <button id="slow"><i class="fa fa-play"></i> Run</button>
+                <button id="fast"><i class="fa fa-forward"></i> Run fast</button>
+                <button id="stop"><i class="fa fa-stop"></i> Stop</button>
+            </div>
+        </div>
+        <h2>Output</h2>
+        <div id="output">Loading ...</div>
+
+        <script type="text/javascript" src="main.js"></script>
+    </body>
+</html>
