@@ -48,13 +48,7 @@ initial pos =
   , instruction: 0 }
 
 initialCode :: String
-initialCode = """slow: left
-      right
-      left
-      skipNext
-      goto slow
-fast: left
-      goto fast"""
+initialCode = ""
 
 initialState :: State
 initialState =
@@ -167,12 +161,14 @@ performAction Randomize _ state update = do
   let p2 = (p1 + delta) `mod` (2 * maxRange)
   update $ state { r1 = initial (p1 - maxRange), r2 = initial (p2 - maxRange) }
 performAction Parse _ state update = update $
-  state { parsed = isRight program
+  state { parsed = nonEmpty program
         , program = program
         , r1 = state.r1 { instruction = 0, position = state.r1.parachute }
         , r2 = state.r2 { instruction = 0, position = state.r2.parachute }
         }
   where program = parseRobo state.code
+        nonEmpty (Right (Cons _ _)) = true
+        nonEmpty _                  = false
 performAction Step _ state update = update $
   state { r1 = either (const state.r1) (\p -> step p state.r2.parachute state.r1) state.program
         , r2 = either (const state.r2) (\p -> step p state.r1.parachute state.r2) state.program }
