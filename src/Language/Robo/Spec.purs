@@ -9,7 +9,7 @@ type Label = String
 
 data Instruction = MoveLeft
                  | MoveRight
-                 | SkipUnlessParachute
+                 | SkipIfParachute
                  | Goto Label
 
 data LInstruction = LInstruction (Maybe Label) Instruction

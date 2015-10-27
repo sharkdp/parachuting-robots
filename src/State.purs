@@ -18,4 +18,7 @@ type State =
   { r1      :: Robot
   , r2      :: Robot
   , code    :: String
-  , program :: Either ParseError Program }
+  , parsed  :: Boolean
+  , program :: Either ParseError Program
+  , running :: Boolean
+  }

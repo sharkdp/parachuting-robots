@@ -7,59 +7,30 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
 
-        <style>
-            html, body {
-                margin: 0;
-                padding: 20px;
-            }
-            body, button {
-                font-family: 'PT Sans', sans-serif;
-            }
-            textarea {
-                background-color: #eee;
-                font-family: 'Source Code Pro', courier;
-                font-size: 18px;
-                width: 100%;
-            }
-            #output {
-                font-family: 'Source Code Pro', courier;
-                font-size: 14px;
-            }
-            button {
-                font-size: 14px;
-            }
-            table tr td {
-                vertical-align: top;
-            }
-            .buttons {
-                text-align: center;
-            }
-        </style>
+        <link href="main.css" rel="stylesheet" type="text/css">
         <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|Source+Code+Pro" rel="stylesheet" type="text/css">
         <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     </head>
     <body>
+        <h1>Robots with parachutes</h1>
+        <p>
+            Two robots are to be parachuted onto random locations on an
+            infinite line. When they land, their parachutes detach and remain
+            where they are. The robots may be programmed from the following
+            instruction set:
+
+            <ul>
+                <li>Go left one unit (<code>left</code>)</li>
+                <li>Go right one unit (<code>right</code>)</li>
+                <li>Skip next instruction if there is a parachute here (<code>skip</code>)</li>
+                <li>Go to label (<code>goto <i>label</i></code>)</li>
+            </ul>
+            Each of these instruction can include a label (<code><i>label</i>: instruction</code>).<br>
+
+            Program the robots to collide.
+        </p>
+
         <div id="container">Loading ...</div>
-        <!-- <div id="controls"> -->
-<!-- <textarea autofocus spellcheck="false" id="code" rows="10" placeholder="Enter your code here.."> -->
-<!-- 1: left -->
-<!-- left -->
-<!-- skip -->
-<!-- goto 1 -->
-<!-- </textarea> -->
-        <!--     <br> -->
-        <!--     <div class="buttons"> -->
-        <!--         <button id="init"><i class="fa fa-random"></i> Initialize</button> -->
-        <!--         <button id="step"><i class="fa fa-step-forward"></i> Single step</button> -->
-        <!--         <button id="slow"><i class="fa fa-play"></i> Run</button> -->
-        <!--         <button id="fast"><i class="fa fa-forward"></i> Run fast</button> -->
-        <!--         <button id="stop"><i class="fa fa-stop"></i> Stop</button> -->
-        <!--     </div> -->
-        <!-- </div> -->
-        <h2>Output</h2>
-        <div id="output">Loading ...</div>
-
-
         <script type="text/javascript" src="bower_components/react/react.min.js"></script>
         <script type="text/javascript" src="main.js"></script>
     </body>

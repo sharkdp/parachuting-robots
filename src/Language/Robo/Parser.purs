@@ -36,7 +36,7 @@ parseInstruction =
   <|>
   (string "right" *> return MoveRight)
   <|>
-  (string "skip" *> return SkipUnlessParachute)
+  (string "skip" *> return SkipIfParachute)
   <|>
   (string "goto" *> sepWhite *> (Goto <$> parseGotoLabel))
   <?> "Unknown instruction"
