@@ -1,8 +1,11 @@
 # Robots with parachutes
 
-[*Play it online*](http://david-peter.de/parachuted-robots/)
+This is an interactive version of a classic puzzle. It is written
+in [Purescript](https://github.com/purescript/purescript).
 
-## Installation
+[**Try the game here**](http://david-peter.de/parachuted-robots/)
+
+## Local install
 
 ```
 bower install
