@@ -11,7 +11,7 @@ import Language.Robo.Spec
 import State
 
 -- | Run a single instruction of the program for a given robot state
-step :: Program -> State -> State
+step :: Program -> Robot -> Robot
 step program st =
   case (index program st.instruction) of
     Just (LInstruction _ instr) -> eval instr
@@ -19,11 +19,11 @@ step program st =
 
   where
     eval MoveRight =
-      st { robot = st.robot + 1 , instruction = st.instruction + 1 }
+      st { position = st.position + 1 , instruction = st.instruction + 1 }
     eval MoveLeft =
-      st { robot = st.robot - 1 , instruction = st.instruction + 1 }
+      st { position = st.position - 1 , instruction = st.instruction + 1 }
     eval SkipUnlessParachute =
-      st { instruction = if st.robot == st.parachute then st.instruction + 1 else st.instruction + 2 }
+      st { instruction = if st.position == st.parachute then st.instruction + 1 else st.instruction + 2 }
     eval (Goto label) =
       st { instruction = findInstruction label }
 
