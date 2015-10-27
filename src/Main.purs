@@ -48,7 +48,8 @@ initial pos =
   , instruction: 0 }
 
 initialCode :: String
-initialCode = ""
+initialCode = """start: left
+       goto start"""
 
 initialState :: State
 initialState =
