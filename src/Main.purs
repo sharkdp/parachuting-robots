@@ -70,7 +70,7 @@ data Action = SetCode String
             | Randomize
 
 -- | Font awesome shortcut
-fa :: String -> _
+fa :: String -> R.ReactElement
 fa str = R.i [ RP.className ("fa fa-" ++ str) ] []
 
 foreign import data TIMER :: !
@@ -139,7 +139,7 @@ showHTML SkipNext     = R.code' [ R.text "skipNext" ]
 showHTML (Goto label) = R.code' [ R.text "goto ", R.i' [ R.text label ] ]
 
 -- | Display the program as a table
-programTable :: Either ParseError Program -> Int -> Int -> _
+programTable :: Either ParseError Program -> Int -> Int -> Array R.ReactElement
 programTable (Left (ParseError msg)) _ _ = [ R.tr' [ R.td' [ R.text ("Parse error: " ++ msg) ] ] ]
 programTable (Right Nil) _ _ = []
 programTable (Right program) i1 i2 = header `A.cons` mapIndexed row (fromList program)
@@ -194,6 +194,7 @@ spec :: T.Spec _ State _ Action
 spec = T.simpleSpec performAction render
 
 -- | Attach the React component to the DOM
+main :: Eff (dom :: DOM.DOM) Unit
 main = void do
   let component = T.createClass spec initialState
   document <- DOM.window >>= DOM.document
