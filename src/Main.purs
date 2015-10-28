@@ -59,7 +59,8 @@ initialState =
   , code: initialCode
   , parsed: false
   , program: Right Nil
-  , running: false }
+  , running: false
+  , collision: false }
 
 -- | UI actions
 data Action = SetCode String
@@ -79,15 +80,19 @@ foreign import toggleInterval :: forall eff. Eff (timer :: TIMER | eff) Unit
 render :: T.Render State _ Action
 render dispatch _ state _ =
   [ R.div [ RP.className "canvas" ]
-    [ R.div [ RP.className "robot1"
-            , RP.style {left: show (screenPos state.r1.position) ++ "px", position: "absolute"} ] []
-    , R.div [ RP.className "robot2"
-            , RP.style {left: show (screenPos state.r2.position) ++ "px", position: "absolute"} ] []
-    , R.div [ RP.className "parachute1"
-            , RP.style {left: show (screenPos state.r1.parachute) ++ "px"} ] []
-    , R.div [ RP.className "parachute2"
-            , RP.style {left: show (screenPos state.r2.parachute) ++ "px"} ] []
-    ]
+    if state.collision
+      then
+        [ R.div [ RP.className "collision" ] [ fa "trophy", R.text " Collision!" ] ]
+      else
+        [ R.div [ RP.className "robot1"
+                , RP.style {left: show (screenPos state.r1.position) ++ "px", position: "absolute"} ] []
+        , R.div [ RP.className "robot2"
+                , RP.style {left: show (screenPos state.r2.position) ++ "px", position: "absolute"} ] []
+        , R.div [ RP.className "parachute1"
+                , RP.style {left: show (screenPos state.r1.parachute) ++ "px"} ] []
+        , R.div [ RP.className "parachute2"
+                , RP.style {left: show (screenPos state.r2.parachute) ++ "px"} ] []
+        ]
   , R.div [ RP.className "panel" ]
       [ R.div [ RP.className "editor" ]
           [ R.textarea
@@ -105,11 +110,11 @@ render dispatch _ state _ =
     [ R.button [ RP.onClick \_ -> dispatch Parse
                , RP.disabled state.running ]
                [ fa "cogs", R.text " Parse" ]
-    , R.button [ RP.disabled (not state.parsed)
+    , R.button [ RP.disabled (not state.parsed || state.collision)
                , RP._id "step"
                , RP.onClick \_ -> dispatch Step ]
                [ fa "step-forward", R.text " Step" ]
-    , R.button [ RP.disabled (not state.parsed)
+    , R.button [ RP.disabled (not state.parsed || state.collision)
                , RP.onClick \_ -> dispatch ToggleRunning ]
                if state.running
                   then [ fa "stop", R.text " Stop" ]
@@ -161,19 +166,25 @@ performAction Randomize _ state update = do
   p1 <- randomInt 0 maxRange
   delta <- randomInt 1 (maxRange - 1)
   let p2 = (p1 + delta) `mod` (2 * maxRange)
-  update $ state { r1 = initial (p1 - maxRange), r2 = initial (p2 - maxRange) }
+  update $ state { r1 = initial (p1 - maxRange), r2 = initial (p2 - maxRange), collision = false }
 performAction Parse _ state update = update $
   state { parsed = nonEmpty program
         , program = program
         , r1 = state.r1 { instruction = 0, position = state.r1.parachute }
         , r2 = state.r2 { instruction = 0, position = state.r2.parachute }
+        , collision = false
         }
   where program = stripComments <$> parseRobo state.code
         nonEmpty (Right (Cons _ _)) = true
         nonEmpty _                  = false
-performAction Step _ state update = update $
-  state { r1 = either (const state.r1) (\p -> step p state.r2.parachute state.r1) state.program
-        , r2 = either (const state.r2) (\p -> step p state.r1.parachute state.r2) state.program }
+performAction Step _ state update = do
+  let st' = either (const state) (step state) state.program
+  if st'.collision && st'.running
+    then do
+      toggleInterval
+      update st' { running = false }
+    else
+      update st'
 performAction ToggleRunning _ state update = do
   toggleInterval
   update $ state { running = not state.running }

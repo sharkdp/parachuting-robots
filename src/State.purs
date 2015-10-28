@@ -19,10 +19,11 @@ type Robot =
 
 -- | UI state
 type State =
-  { r1      :: Robot
-  , r2      :: Robot
-  , code    :: String
-  , parsed  :: Boolean
-  , program :: Either ParseError Program
-  , running :: Boolean
+  { r1        :: Robot
+  , r2        :: Robot
+  , code      :: String
+  , parsed    :: Boolean
+  , program   :: Either ParseError Program
+  , running   :: Boolean
+  , collision :: Boolean
   }
