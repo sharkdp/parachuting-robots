@@ -39,23 +39,34 @@ parseInstruction =
   <|> (string "goto" *> many1 space *> (Goto <$> parseGotoLabel))
   <?> "Unknown instruction"
 
+toString :: List Char -> String
+toString = trim <<< foldMap C.toString
+
 parseLabel :: Parser Label
 parseLabel = do
   label <- many1 (satisfy (\c -> c /= ':' && c /= '\n' && c /= '\r'))
   char ':'
   skipWhite
-  return $ trim (foldMap C.toString label)
+  return $ toString label
 
 parseGotoLabel :: Parser Label
 parseGotoLabel = do
   label <- many1 (satisfy (\c -> c /= ' ' && c /= '\n' && c /= '\r'))
-  return $ trim (foldMap C.toString label)
+  return $ toString label
+
+parseComment :: Parser LInstruction
+parseComment = do
+  char '#'
+  comment <- many1 (satisfy (\c -> c /= '\n' && c /= '\r'))
+  return $ Comment (toString comment)
 
 parseLInstruction :: Parser LInstruction
-parseLInstruction = do
-  label <- optionMaybe (try parseLabel)
-  instr <- parseInstruction
-  return $ LInstruction label instr
+parseLInstruction =
+  parseComment
+  <|> do
+    label <- optionMaybe (try parseLabel)
+    instr <- parseInstruction
+    return $ LInstruction label instr
 
 separator :: Parser Unit
 separator = void (skipWhite *> newline *> many (newline <|> space))

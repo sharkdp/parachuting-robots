@@ -58,6 +58,11 @@ main = do
     , "  left   \n  right"
     ]
 
+  allParseAs ((Comment "foo") : (nl MoveLeft) : (Comment "bar") : (nl MoveRight) : Nil)
+    [ "#foo\nleft\n#bar\nright"
+    , "  #foo \n  left   \n  #  bar  \n right"
+    ]
+
   allParseAs ((l "foo" MoveLeft) : (nl $ Goto "foo") : Nil)
     [ "foo: left\ngoto foo"
     , "   foo: left   \n   \n  goto    foo  "
@@ -66,13 +71,17 @@ main = do
   shouldParseAs
     (  (l "left" MoveLeft)
      : (l "right" MoveRight)
+     : (Comment "first comment")
      : (l "skipNext" SkipNext)
+     : (Comment "second comment")
      : (l "goto" (Goto "left"))
      : Nil)
     """
     left: left
     right: right
+    # first comment
     skipNext: skipNext
+    # second comment
     goto: goto left
     """
 

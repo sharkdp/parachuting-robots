@@ -15,7 +15,7 @@ step :: Program -> Position -> Robot -> Robot
 step program otherParachute st =
   case (index program st.instruction) of
     Just (LInstruction _ instr) -> eval instr
-    Nothing -> st
+    _ -> st
 
   where
     eval MoveRight =

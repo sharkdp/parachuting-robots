@@ -48,7 +48,8 @@ initial pos =
   , instruction: 0 }
 
 initialCode :: String
-initialCode = """start: left
+initialCode = """# Useless example program
+start: left
        goto start"""
 
 initialState :: State
@@ -167,7 +168,7 @@ performAction Parse _ state update = update $
         , r1 = state.r1 { instruction = 0, position = state.r1.parachute }
         , r2 = state.r2 { instruction = 0, position = state.r2.parachute }
         }
-  where program = parseRobo state.code
+  where program = stripComments <$> parseRobo state.code
         nonEmpty (Right (Cons _ _)) = true
         nonEmpty _                  = false
 performAction Step _ state update = update $
