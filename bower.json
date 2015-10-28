@@ -7,7 +7,7 @@
     "output"
   ],
   "dependencies": {
-    "font-awesome": "~4.4.0",
+    "font-awesome": "^4.4.0",
     "react": "^0.14.0",
     "purescript-dom": "^0.2.6",
     "purescript-either": "^0.2.2",
@@ -17,5 +17,8 @@
     "purescript-strings": "^0.7.0",
     "purescript-thermite": "git://github.com/paf31/purescript-thermite#master",
     "purescript-random": "^0.2.2"
+  },
+  "devDependencies": {
+    "purescript-exceptions": "^0.3.0"
   }
 }

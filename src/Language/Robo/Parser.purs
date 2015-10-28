@@ -22,42 +22,34 @@ import Text.Parsing.StringParser.String
 
 import Language.Robo.Spec
 
-space :: Parser String
-space = string " " <|> string "\t"
+space :: Parser Unit
+space = void (string " " <|> string "\t")
 
 skipWhite :: Parser Unit
-skipWhite = many space *> return unit
+skipWhite = void (many space)
 
-sepWhite :: Parser Unit
-sepWhite = many1 space *> return unit
-
-newline :: Parser Char
-newline = char '\n' <|> char '\r'
-
-newlines :: Parser Unit
-newlines = void $ many1 newline
+newline :: Parser Unit
+newline = void (char '\n' <|> char '\r')
 
 parseInstruction :: Parser Instruction
 parseInstruction =
-  skipWhite *> (
-        (string "left" *> return MoveLeft)
-    <|> (string "right" *> return MoveRight)
-    <|> (string "skipNext" *> return SkipNext)
-    <|> (string "goto" *> sepWhite *> (Goto <$> parseGotoLabel))
-    <?> "Unknown instruction"
-  ) <* skipWhite
+      (string "left" *> return MoveLeft)
+  <|> (string "right" *> return MoveRight)
+  <|> (string "skipNext" *> return SkipNext)
+  <|> (string "goto" *> many1 space *> (Goto <$> parseGotoLabel))
+  <?> "Unknown instruction"
 
 parseLabel :: Parser Label
 parseLabel = do
   label <- many1 (satisfy (\c -> c /= ':' && c /= '\n' && c /= '\r'))
   char ':'
   skipWhite
-  return $ trim $ foldMap C.toString label
+  return $ trim (foldMap C.toString label)
 
 parseGotoLabel :: Parser Label
 parseGotoLabel = do
   label <- many1 (satisfy (\c -> c /= ' ' && c /= '\n' && c /= '\r'))
-  return $ trim $ foldMap C.toString label
+  return $ trim (foldMap C.toString label)
 
 parseLInstruction :: Parser LInstruction
 parseLInstruction = do
@@ -65,8 +57,11 @@ parseLInstruction = do
   instr <- parseInstruction
   return $ LInstruction label instr
 
+separator :: Parser Unit
+separator = void (skipWhite *> newline *> many (newline <|> space))
+
 parseProgram :: Parser Program
-parseProgram = sepBy parseLInstruction newlines <* eof
+parseProgram = sepBy parseLInstruction separator <* eof
 
 parseRobo :: String -> Either ParseError Program
 parseRobo = runParser parseProgram <<< trim
