@@ -108,18 +108,28 @@ render dispatch _ state _ =
       ]
   , R.div [ RP.className "buttons" ]
     [ R.button [ RP.onClick \_ -> dispatch Parse
+               , RP.title "Transfer your program to the robots"
                , RP.disabled state.running ]
                [ fa "cogs", R.text " Parse" ]
     , R.button [ RP.disabled (not state.parsed || state.collision)
                , RP._id "step"
+               , RP.title (if (not state.parsed)
+                             then "You need to parse your program first"
+                             else "Run a single instruction for each robot")
                , RP.onClick \_ -> dispatch Step ]
                [ fa "step-forward", R.text " Step" ]
     , R.button [ RP.disabled (not state.parsed || state.collision)
+               , RP.title (if (not state.parsed)
+                             then "You need to parse your program first"
+                             else (if state.running
+                                     then "Stop the running program"
+                                     else "Start the program"))
                , RP.onClick \_ -> dispatch ToggleRunning ]
                if state.running
                   then [ fa "stop", R.text " Stop" ]
                   else [ fa "play", R.text " Run" ]
     , R.button [ RP.onClick \_ -> dispatch Randomize
+               , RP.title "Deploy the robots to new starting positions"
                , RP.disabled state.running ]
                [ fa "random", R.text " Randomize" ]
     ]
