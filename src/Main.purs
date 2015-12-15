@@ -36,7 +36,7 @@ import Language.Robo.Interpreter
 
 -- | Maximum distance of the initial position from the origin
 maxRange :: Int
-maxRange = 8
+maxRange = 5
 
 -- | Initial state of a robot for a given starting position
 initial :: Position -> Robot
@@ -171,10 +171,12 @@ performAction (SetCode code) _ state update = do
   when state.running toggleInterval
   update $ state { code = code, parsed = false, program = Right Nil, running = false }
 performAction Randomize _ state update = do
-  p1 <- randomInt 0 maxRange
-  delta <- randomInt 1 (maxRange - 1)
+  p1 <- randomInt 0 (2 * maxRange)
+  delta <- randomInt 1 (2 * maxRange - 1)
   let p2 = (p1 + delta) `mod` (2 * maxRange)
-  update $ state { r1 = initial (p1 - maxRange), r2 = initial (p2 - maxRange), collision = false }
+  update $ state { r1 = initial (p1 - maxRange)
+                 , r2 = initial (p2 - maxRange)
+                 , collision = false }
 performAction Parse _ state update = update $
   state { parsed = nonEmpty program
         , program = program
