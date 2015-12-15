@@ -11,7 +11,7 @@
     "react": "^0.14.0",
     "purescript-dom": "^0.2.6",
     "purescript-either": "^0.2.2",
-    "purescript-generics": "^0.6.0",
+    "purescript-generics": "^0.7.0",
     "purescript-lists": "^0.7.4",
     "purescript-string-parsers": "^0.6.0",
     "purescript-strings": "^0.7.0",

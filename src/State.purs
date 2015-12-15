@@ -3,7 +3,7 @@ module State where
 import Prelude
 
 import Data.Either
-import Text.Parsing.StringParser (ParseError(..))
+import Text.Parsing.StringParser (ParseError())
 
 import Language.Robo.Spec
 

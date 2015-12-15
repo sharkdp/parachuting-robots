@@ -10,10 +10,7 @@ import Control.Apply
 import qualified Data.Char as C
 import Data.Either
 import Data.Foldable
-import Data.Int (fromString)
-import Data.List (List(..), toList)
-import Data.Maybe
-import Data.Maybe.Unsafe (fromJust)
+import Data.List (List())
 import Data.String
 
 import Text.Parsing.StringParser
