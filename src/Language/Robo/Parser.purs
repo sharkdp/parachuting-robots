@@ -7,7 +7,7 @@ import Prelude
 import Control.Alt
 import Control.Apply
 
-import qualified Data.Char as C
+import Data.Char as C
 import Data.Either
 import Data.Foldable
 import Data.List (List())

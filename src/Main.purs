@@ -6,7 +6,7 @@ import Control.Monad
 import Control.Monad.Eff
 import Control.Monad.Eff.Random
 
-import qualified Data.Array as A
+import Data.Array as A
 import Data.Either
 import Data.Int
 import Data.List
@@ -17,17 +17,17 @@ import Data.Nullable (toMaybe)
 import Text.Parsing.StringParser (ParseError(..))
 import Unsafe.Coerce (unsafeCoerce)
 
-import qualified Thermite as T
+import Thermite as T
 
-import qualified React as R
-import qualified React.DOM as R
-import qualified React.DOM.Props as RP
+import React as R
+import React.DOM as R
+import React.DOM.Props as RP
 
-import qualified DOM as DOM
-import qualified DOM.HTML as DOM
-import qualified DOM.HTML.Types as DOM
-import qualified DOM.HTML.Window as DOM
-import qualified DOM.Node.ParentNode as DOM
+import DOM as DOM
+import DOM.HTML as DOM
+import DOM.HTML.Types as DOM
+import DOM.HTML.Window as DOM
+import DOM.Node.ParentNode as DOM
 
 import State
 import Language.Robo.Spec
@@ -169,15 +169,15 @@ programTable (Right program) i1 i2 = header `A.cons` mapIndexed row (fromList pr
 performAction :: T.PerformAction _ State _ Action
 performAction (SetCode code) _ state update = do
   when state.running toggleInterval
-  update $ state { code = code, parsed = false, program = Right Nil, running = false }
-performAction Randomize _ state update = do
+  update $ \_ -> state { code = code, parsed = false, program = Right Nil, running = false }
+performAction Randomize _ _ update = do
   p1 <- randomInt 0 (2 * maxRange)
   delta <- randomInt 1 (2 * maxRange - 1)
   let p2 = (p1 + delta) `mod` (2 * maxRange)
-  update $ state { r1 = initial (p1 - maxRange)
-                 , r2 = initial (p2 - maxRange)
-                 , collision = false }
-performAction Parse _ state update = update $
+  update $ \state -> state { r1 = initial (p1 - maxRange)
+                           , r2 = initial (p2 - maxRange)
+                           , collision = false }
+performAction Parse _ state update = update $ \_ ->
   state { parsed = nonEmpty program
         , program = program
         , r1 = state.r1 { instruction = 0, position = state.r1.parachute }
@@ -192,12 +192,12 @@ performAction Step _ state update = do
   if st'.collision && st'.running
     then do
       toggleInterval
-      update st' { running = false }
+      update $ \_ -> st' { running = false }
     else
-      update st'
-performAction ToggleRunning _ state update = do
+      update $ \_ -> st'
+performAction ToggleRunning _ _ update = do
   toggleInterval
-  update $ state { running = not state.running }
+  update $ \state -> state { running = not state.running }
 
 -- | React spec
 spec :: T.Spec _ State _ Action
