@@ -10,6 +10,7 @@ This is an interactive version of a classic puzzle. It is written in
 
 ```
 bower install
-pulp build -O -t main.js
+npm install
+pulp browserify -O -t main.js
 lessc main.less > main.css
 ```

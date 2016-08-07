@@ -20,13 +20,13 @@ fail msg = throwException $ error msg
 shouldParseAs :: forall eff. Program -> String -> Eff (err :: EXCEPTION | eff) Unit
 shouldParseAs expected input =
     case parseRobo input of
-        Left err -> fail $ "Parse error for input '" ++ input ++ "': " ++ show err
+        Left err -> fail $ "Parse error for input '" <> input <> "': " <> show err
         Right output ->
             unless (output == expected) $ do
-                fail $ "Unexpected result:\n" ++
-                       "Input:    '" ++ input ++ "'\n" ++
-                       "Output:   " ++ show output ++ "\n" ++
-                       "Expected: " ++ show expected ++ "\n"
+                fail $ "Unexpected result:\n" <>
+                       "Input:    '" <> input <> "'\n" <>
+                       "Output:   " <> show output <> "\n" <>
+                       "Expected: " <> show expected <> "\n"
 
 allParseAs :: forall eff. Program -> Array String -> Eff (err :: EXCEPTION | eff) Unit
 allParseAs expected = traverse_ (shouldParseAs expected)
@@ -34,8 +34,8 @@ allParseAs expected = traverse_ (shouldParseAs expected)
 shouldFail :: forall eff. String -> Eff (err :: EXCEPTION | eff) Unit
 shouldFail input = do
     case (parseRobo input) of
-         Left _ -> return unit
-         Right output -> fail $ "Should throw a parse error: '" ++ input ++ "'"
+         Left _ -> pure unit
+         Right output -> fail $ "Should throw a parse error: '" <> input <> "'"
 
 -- | Add label
 l :: String -> Instruction -> LInstruction

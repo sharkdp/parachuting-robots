@@ -5,14 +5,16 @@ import Prelude
 import Control.Monad
 import Control.Monad.Eff
 import Control.Monad.Eff.Random
+import Control.Monad.Trans (lift)
+import Control.Monad.Eff.Class (liftEff)
 
 import Data.Array as A
 import Data.Either
 import Data.Int
 import Data.List
 import Data.Maybe
-import Data.Maybe.Unsafe (fromJust)
 import Data.Nullable (toMaybe)
+import Partial.Unsafe (unsafePartial)
 
 import Text.Parsing.StringParser (ParseError(..))
 import Unsafe.Coerce (unsafeCoerce)
@@ -22,6 +24,7 @@ import Thermite as T
 import React as R
 import React.DOM as R
 import React.DOM.Props as RP
+import ReactDOM as RDOM
 
 import DOM as DOM
 import DOM.HTML as DOM
@@ -69,7 +72,7 @@ data Action = SetCode String
 
 -- | Font awesome shortcut
 fa :: String -> R.ReactElement
-fa str = R.i [ RP.className ("fa fa-" ++ str) ] []
+fa str = R.i [ RP.className ("fa fa-" <> str) ] []
 
 foreign import data TIMER :: !
 foreign import toggleInterval :: forall eff. Eff (timer :: TIMER | eff) Unit
@@ -83,13 +86,13 @@ render dispatch _ state _ =
         [ R.div [ RP.className "collision" ] [ fa "trophy", R.text " Collision!" ] ]
       else
         [ R.div [ RP.className "robot1"
-                , RP.style {left: show (screenPos state.r1.position) ++ "px", position: "absolute"} ] []
+                , RP.style {left: show (screenPos state.r1.position) <> "px", position: "absolute"} ] []
         , R.div [ RP.className "robot2"
-                , RP.style {left: show (screenPos state.r2.position) ++ "px", position: "absolute"} ] []
+                , RP.style {left: show (screenPos state.r2.position) <> "px", position: "absolute"} ] []
         , R.div [ RP.className "parachute1"
-                , RP.style {left: show (screenPos state.r1.parachute) ++ "px"} ] []
+                , RP.style {left: show (screenPos state.r1.parachute) <> "px"} ] []
         , R.div [ RP.className "parachute2"
-                , RP.style {left: show (screenPos state.r2.parachute) ++ "px"} ] []
+                , RP.style {left: show (screenPos state.r2.parachute) <> "px"} ] []
         ]
   , R.div [ RP.className "panel" ]
       [ R.div [ RP.className "editor" ]
@@ -102,7 +105,7 @@ render dispatch _ state _ =
             [ R.text initialCode ]
           ]
           , R.div [ RP.className "program" ]
-          [ R.table' (programTable state.program state.r1.instruction state.r2.instruction) ]
+          [ R.table' [ R.tbody' (programTable state.program state.r1.instruction state.r2.instruction) ] ]
       ]
   , R.div [ RP.className "buttons" ]
     [ R.button [ RP.onClick \_ -> dispatch Parse
@@ -148,9 +151,9 @@ showHTML (Goto label) = R.code' [ R.text "goto ", R.i' [ R.text label ] ]
 
 -- | Display the program as a table
 programTable :: Either ParseError Program -> Int -> Int -> Array R.ReactElement
-programTable (Left (ParseError msg)) _ _ = [ R.tr' [ R.td' [ R.text ("Parse error: " ++ msg) ] ] ]
+programTable (Left (ParseError msg)) _ _ = [ R.tr' [ R.td' [ R.text ("Parse error: " <> msg) ] ] ]
 programTable (Right Nil) _ _ = []
-programTable (Right program) i1 i2 = header `A.cons` mapIndexed row (fromList program)
+programTable (Right program) i1 i2 = header `A.cons` mapIndexed row (A.fromFoldable program)
   where header =
           R.tr'
             [ R.th' [ R.text "R", R.sub' [ R.text "1" ] ]
@@ -164,20 +167,25 @@ programTable (Right program) i1 i2 = header `A.cons` mapIndexed row (fromList pr
             , R.td' [ R.code' [ R.text (fromMaybe "" label) ] ]
             , R.td' [ showHTML inst ]
             ]
+        row _ (Comment _) = R.tr' [] -- unreachable case
 
 -- | Update the state
-performAction :: T.PerformAction _ State _ Action
-performAction (SetCode code) _ state update = do
-  when state.running toggleInterval
-  update $ \_ -> state { code = code, parsed = false, program = Right Nil, running = false }
-performAction Randomize _ _ update = do
-  p1 <- randomInt 0 (2 * maxRange)
-  delta <- randomInt 1 (2 * maxRange - 1)
+performAction :: forall p. T.PerformAction (timer :: TIMER, random :: RANDOM) State p Action
+performAction (SetCode code) _ state = void do
+  when state.running (lift (liftEff toggleInterval))
+  T.cotransform $
+    \_ -> state { code = code
+                , parsed = false
+                , program = Right Nil
+                , running = false }
+performAction Randomize _ _ = do
+  p1 <- lift $ liftEff $ randomInt 0 (2 * maxRange)
+  delta <- lift $ liftEff $ randomInt 1 (2 * maxRange - 1)
   let p2 = (p1 + delta) `mod` (2 * maxRange)
-  update $ \state -> state { r1 = initial (p1 - maxRange)
-                           , r2 = initial (p2 - maxRange)
-                           , collision = false }
-performAction Parse _ state update = update $ \_ ->
+  void $ T.cotransform $ \state -> state { r1 = initial (p1 - maxRange)
+                                         , r2 = initial (p2 - maxRange)
+                                         , collision = false }
+performAction Parse _ state = void $ T.cotransform $ \_ ->
   state { parsed = nonEmpty program
         , program = program
         , r1 = state.r1 { instruction = 0, position = state.r1.parachute }
@@ -187,17 +195,17 @@ performAction Parse _ state update = update $ \_ ->
   where program = stripComments <$> parseRobo state.code
         nonEmpty (Right (Cons _ _)) = true
         nonEmpty _                  = false
-performAction Step _ state update = do
+performAction Step _ state = do
   let st' = either (const state) (step state) state.program
   if st'.collision && st'.running
-    then do
-      toggleInterval
-      update $ \_ -> st' { running = false }
+    then void do
+      lift (liftEff toggleInterval)
+      T.cotransform $ \_ -> st' { running = false }
     else
-      update $ \_ -> st'
-performAction ToggleRunning _ _ update = do
-  toggleInterval
-  update $ \state -> state { running = not state.running }
+      void $ T.cotransform $ \_ -> st'
+performAction ToggleRunning _ _ = void do
+  lift (liftEff toggleInterval)
+  T.cotransform $ \state -> state { running = not state.running }
 
 -- | React spec
 spec :: T.Spec _ State _ Action
@@ -208,5 +216,5 @@ main :: Eff (dom :: DOM.DOM) Unit
 main = void do
   let component = T.createClass spec initialState
   document <- DOM.window >>= DOM.document
-  container <- fromJust <<< toMaybe <$> DOM.querySelector "#component" (DOM.htmlDocumentToParentNode document)
-  R.render (R.createFactory component {}) container
+  container <- unsafePartial (fromJust <<< toMaybe <$> DOM.querySelector "#component" (DOM.htmlDocumentToParentNode document))
+  RDOM.render (R.createFactory component {}) container

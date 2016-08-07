@@ -43,4 +43,7 @@ step st program =
 
         -- Jump to instruction -1 if label cannot be found
         findInstruction label =
-          fromMaybe (-1) $ findIndex (\(LInstruction mlabel _) -> mlabel == Just label) program
+          fromMaybe (-1) $ findIndex (cond label) program
+
+        cond label (LInstruction mlabel _) = mlabel == Just label
+        cond label _ = false

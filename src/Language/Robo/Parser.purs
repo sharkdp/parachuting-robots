@@ -30,32 +30,32 @@ newline = void (char '\n' <|> char '\r')
 
 parseInstruction :: Parser Instruction
 parseInstruction =
-      (string "left" *> return MoveLeft)
-  <|> (string "right" *> return MoveRight)
-  <|> (string "skipNext" *> return SkipNext)
+      (string "left" *> pure MoveLeft)
+  <|> (string "right" *> pure MoveRight)
+  <|> (string "skipNext" *> pure SkipNext)
   <|> (string "goto" *> many1 space *> (Goto <$> parseGotoLabel))
   <?> "Unknown instruction"
 
 toString :: List Char -> String
-toString = trim <<< foldMap C.toString
+toString = trim <<< foldMap singleton
 
 parseLabel :: Parser Label
 parseLabel = do
   label <- many1 (satisfy (\c -> c /= ':' && c /= '\n' && c /= '\r'))
   char ':'
   skipWhite
-  return $ toString label
+  pure $ toString label
 
 parseGotoLabel :: Parser Label
 parseGotoLabel = do
   label <- many1 (satisfy (\c -> c /= ' ' && c /= '\n' && c /= '\r'))
-  return $ toString label
+  pure $ toString label
 
 parseComment :: Parser LInstruction
 parseComment = do
   char '#'
   comment <- many1 (satisfy (\c -> c /= '\n' && c /= '\r'))
-  return $ Comment (toString comment)
+  pure $ Comment (toString comment)
 
 parseLInstruction :: Parser LInstruction
 parseLInstruction =
@@ -63,7 +63,7 @@ parseLInstruction =
   <|> do
     label <- optionMaybe (try parseLabel)
     instr <- parseInstruction
-    return $ LInstruction label instr
+    pure $ LInstruction label instr
 
 separator :: Parser Unit
 separator = void (skipWhite *> newline *> many (newline <|> space))
