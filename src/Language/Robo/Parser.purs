@@ -22,11 +22,17 @@ import Language.Robo.Spec
 space :: Parser Unit
 space = void (string " " <|> string "\t")
 
-skipWhite :: Parser Unit
-skipWhite = void (many space)
-
 newline :: Parser Unit
 newline = void (char '\n' <|> char '\r')
+
+whitespace :: Parser Unit
+whitespace = space <|> newline
+
+skipSpace :: Parser Unit
+skipSpace = void (many space)
+
+skipWhite :: Parser Unit
+skipWhite = void (many whitespace)
 
 parseInstruction :: Parser Instruction
 parseInstruction =
@@ -66,7 +72,7 @@ parseLInstruction =
     pure $ LInstruction label instr
 
 separator :: Parser Unit
-separator = void (skipWhite *> newline *> many (newline <|> space))
+separator = void (skipSpace *> newline *> many (newline <|> space))
 
 parseProgram :: Parser Program
 parseProgram = sepBy parseLInstruction separator <* eof
