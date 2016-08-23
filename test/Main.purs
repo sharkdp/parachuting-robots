@@ -85,6 +85,33 @@ main = do
     goto: goto left
     """
 
+  shouldParseAs
+    (  (l "left" MoveLeft)
+     : (nl MoveLeft)
+     : (l "right" MoveRight)
+     : (Comment "first comment")
+     : (l "skipNext" SkipNext)
+     : (Comment "second comment")
+     : (l "goto" (Goto "left"))
+     : Nil)
+    """
+    left:
+    left
+    left
+
+    right:right
+
+    # first comment
+    skipNext:
+    skipNext
+
+    # second comment
+    goto:
+    goto left
+    """
+
   shouldFail "foo"
   shouldFail "left right"
   shouldFail "left \n foo"
+  shouldFail "label1: \n label2:"
+  shouldFail "justlabel:"
